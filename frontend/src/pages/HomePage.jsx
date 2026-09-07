@@ -39,7 +39,7 @@ export default function HomePage() {
     products,
     isLoading,
     error,
-    getProducts,
+    getAvailableProducts,
   } = useProductStore();
 
   const getCart = useCartStore(
@@ -49,9 +49,9 @@ export default function HomePage() {
     useState("all");
 
   useEffect(() => {
-    getProducts();
+    getAvailableProducts();
     getCart();
-  }, [getProducts, getCart]);
+  }, [getAvailableProducts, getCart]);
 
   const filteredProducts =
     selectedCategory === "all"

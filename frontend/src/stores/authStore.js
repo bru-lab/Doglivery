@@ -113,35 +113,40 @@ export const useAuthStore = create((set) => ({
   },
 
   // Update profile
-  updateProfile: async (data) => {
-    try {
-      set({isUpdatingProfile: true})
+  // Update profile
+updateProfile: async (formData) => {
+  try {
+    set({ isUpdatingProfile: true });
 
-      const response = await api.patch("/auth/update-profile", data);
+    const response = await api.patch(
+      "/auth/update-profile",
+      formData
+    );
 
-      set({
-        authUser: response.data.user,
-      });
+    set({
+      authUser: response.data.user,
+    });
 
-      return {
-        success: true,
-        user: response.data,
-      };
-    } catch (error) {
-       console.error(
-        "Error updating profile:",
-        error.response?.data || error.message
-      );
+    return {
+      success: true,
+      user: response.data.user,
+    };
+  } catch (error) {
+    console.error(
+      "Error updating profile:",
+      error.response?.data || error.message
+    );
 
-      return {
-        success: false,
-        error:
-          error.response?.data?.message
-      };
-    } finally{
-      set({isUpdatingProfile: false});
-    }
-  },
+    return {
+      success: false,
+      error:
+        error.response?.data?.message ||
+        "Não foi possível atualizar o perfil.",
+    };
+  } finally {
+    set({ isUpdatingProfile: false });
+  }
+},
 
   // Logout
   logout: async () => {

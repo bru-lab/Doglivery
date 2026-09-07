@@ -96,7 +96,7 @@ function App() {
             />
 
             <Route
-              path="products"
+              path="/admin/products"
               element={<AdminProductsPage />} />
 
             <Route

@@ -6,6 +6,7 @@ export const useProductStore = create((set) => ({
   selectedProduct: null,
 
   isLoadingProducts: false,
+  isLoadingAdminProducts: false,
   isLoadingProduct: false,
   isCreatingProduct: false,
   isUpdatingProduct: false,
@@ -14,14 +15,14 @@ export const useProductStore = create((set) => ({
   error: null,
 
   // Get all products
-  getProducts: async () => {
+  getAvailableProducts: async () => {
     try {
       set({
         isLoadingProducts: true,
         error: null,
       });
 
-      const response = await api.get("/products");
+      const response = await api.get("/products/available");
 
       set({
         products: response.data,
@@ -39,6 +40,33 @@ export const useProductStore = create((set) => ({
       });
     }
   },
+
+  getProducts: async () => {
+    try {
+      set({
+        isLoadingAdminProducts: true,
+        error: null,
+      });
+
+      const response = await api.get("/products/admin");
+
+      set({
+        products: response.data,
+        isLoadingAdminProducts: false,
+      });
+
+    } catch (error) {
+      console.error("Error getting products:", error);
+
+      set({
+        error:
+          error.response?.data?.message ||
+          "Failed to load products.",
+        isLoadingAdminProducts: false,
+      });
+    }
+  },
+
 
 
   // Get product by ID

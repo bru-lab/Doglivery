@@ -1,3 +1,4 @@
+import fs from "fs";
 import { generateToken } from '../lib/token.js';
 import User from '../models/user.model.js';
 import bcrypt from 'bcrypt';
@@ -111,38 +112,70 @@ export const logout = (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const { profilePic } = req.body;
     const userId = req.user._id;
 
-    if (!profilePic) {
+    if (!req.file) {
       return res.status(400).json({
         message: "Profile pic is required",
       });
     }
 
+    const user = await User.findById(userId);
+
+    if (!user) {
+      // Delete temporary file even if user doesn't exist
+      fs.unlinkSync(req.file.path);
+
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    // Upload temporary file to Cloudinary
     const uploadResponse = await cloudinary.uploader.upload(
-      profilePic,
+      req.file.path,
       {
         folder: "hot-dog-delivery/profiles",
       }
     );
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      {
-        profilePic: uploadResponse.secure_url,
-      },
-      {
-        new: true,
-      }
-    ).select("-password");
+    // Delete the temporary local file
+    fs.unlinkSync(req.file.path);
+
+    // Delete previous Cloudinary image
+    if (user.profilePic?.publicId) {
+      await cloudinary.uploader.destroy(
+        user.profilePic.publicId
+      );
+    }
+
+    // Save new Cloudinary image
+    user.profilePic = {
+      url: uploadResponse.secure_url,
+      publicId: uploadResponse.public_id,
+    };
+
+    await user.save();
 
     return res.status(200).json({
       message: "Profile picture updated successfully",
-      user: updatedUser,
+      user: {
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        profilePic: user.profilePic,
+        role: user.role,
+      },
     });
+
   } catch (error) {
     console.error("Error in update profile:", error);
+
+    // If something fails after Multer created the file,
+    // try to delete the temporary file.
+    if (req.file?.path && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
 
     return res.status(500).json({
       message: "Internal server error",

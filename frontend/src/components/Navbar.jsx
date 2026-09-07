@@ -16,11 +16,13 @@ function Navbar() {
   const { authUser, logout, isLoggingOut } =
     useAuthStore();
 
-  const getItemCount = useCartStore(
-    (state) => state.getItemCount
+  const items = useCartStore((state) => state.items);
+
+  const itemCount = items.reduce(
+    (total, item) => total + item.quantity,
+    0
   );
 
-  const itemCount = getItemCount();
 
   const handleLogout = async () => {
     await logout();

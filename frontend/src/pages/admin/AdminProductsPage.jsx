@@ -7,7 +7,7 @@ export default function AdminProducts() {
     products,
     getProducts,
     deleteProduct,
-    isLoadingProducts,
+    isLoadingAdminProducts,
     isDeletingProduct,
     error,
   } = useProductStore();
@@ -82,7 +82,7 @@ export default function AdminProducts() {
 
 
       {/* Loading */}
-      {isLoadingProducts ? (
+      {isLoadingAdminProducts ? (
 
         <div className="bg-white border border-gray-200 rounded-xl p-10 text-center">
           <p className="text-gray-500">

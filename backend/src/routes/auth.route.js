@@ -7,7 +7,14 @@ const router = express.Router();
 router.post("/signup", signup);
 router.post("/login", login);
 router.post("/logout", logout);
-router.patch("/update-profile", protectRoute, updateProfile);
+import upload from "../middleware/upload.js";
+
+router.patch(
+  "/update-profile",
+  protectRoute,
+  upload.single("profilePic"),
+  updateProfile
+);
 
 router.get("/check", protectRoute, checkAuth);
 

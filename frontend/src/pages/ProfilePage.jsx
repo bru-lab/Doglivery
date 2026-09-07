@@ -30,17 +30,18 @@ export default function ProfilePage() {
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
+
     if (!file) return;
 
-    const reader = new FileReader();
+    const formData = new FormData();
 
-    reader.readAsDataURL(file);
+    formData.append("profilePic", file);
 
-    reader.onload = async () => {
-      const base64Image = reader.result;
-      setSelectedImg(base64Image);
-      await updateProfile({ profilePic: base64Image });
-    };
+    const result = await updateProfile(formData);
+
+    if (result.success) {
+      setSelectedImg(URL.createObjectURL(file));
+    }
   };
 
   return (
@@ -66,7 +67,7 @@ export default function ProfilePage() {
                 <img
                   src={
                     selectedImg ||
-                    authUser?.profilePic ||
+                    authUser?.profilePic?.url ||
                     "/avatar.png"
                   }
                   alt="Profile"

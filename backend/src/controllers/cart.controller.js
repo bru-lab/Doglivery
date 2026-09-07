@@ -26,6 +26,12 @@ export const addToCart = async (req, res) => {
       });
     }
 
+    if (!product.available) {
+      return res.status(400).json({
+        message: "This product is currently unavailable.",
+      });
+    }
+
     let cart = await Cart.findOne({
       user: req.user._id,
     });
