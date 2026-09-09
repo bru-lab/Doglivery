@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import api from "../lib/axios";
 
+const baseURL = import.meta.env.NODE === "development"? "http://localhost:5000" : "/";
+
 export const useAuthStore = create((set) => ({
   authUser: null,
 
